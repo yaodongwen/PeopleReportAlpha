@@ -1,0 +1,262 @@
+<Alphasim>
+
+    <Constants
+        backdays="900"
+        niodatapath="/data/simucache"
+        niomapprivate="true"
+        refreshDays="2"
+        checkpointDir=""
+        checkpointDays="5"
+        authorWeight=""/>
+
+    <Universe
+        startdate="20160101"
+        enddate="20240630"
+        secID="/data/raw/secID"
+        holidaysfile="/data/raw/holidays"/>
+
+    <Modules>
+
+        <!-- ============================================= -->
+        <!-- Universe -->
+        <!-- ============================================= -->
+
+        <Data
+            id="ALL"
+            module="UmgrAll"/>
+
+        <Data
+            id="TOP3000"
+            module="UmgrTopliquid"
+            univsize="3000"
+            volwindow="63"
+            minprice="1."
+            maxprice="10000."
+            minvol="0."
+            mincap="0."
+            minlive="30"
+            postipo="240"/>
+
+        <Data
+            id="TOP2500"
+            module="UmgrTopliquid"
+            univsize="2500"
+            volwindow="63"
+            minprice="1."
+            maxprice="10000."
+            minvol="0."
+            mincap="0."
+            minlive="30"
+            postipo="240"/>
+
+        <Data
+            id="TOP2000"
+            module="UmgrTopliquid"
+            univsize="2000"
+            volwindow="63"
+            minprice="1."
+            maxprice="10000."
+            minvol="0."
+            mincap="0."
+            minlive="30"
+            postipo="240"/>
+
+        <Data
+            id="TOP1000"
+            module="UmgrTopliquid"
+            univsize="1000"
+            volwindow="63"
+            minprice="1."
+            maxprice="10000."
+            minvol="0."
+            mincap="0."
+            minlive="30"
+            postipo="240"/>
+
+        <Data
+            id="TOP500"
+            module="UmgrTopliquid"
+            univsize="500"
+            volwindow="63"
+            minprice="1."
+            maxprice="10000."
+            minvol="0."
+            mincap="0."
+            minlive="30"
+            postipo="240"/>
+
+        <!-- ============================================= -->
+        <!-- Basic data -->
+        <!-- ============================================= -->
+
+        <Data
+            id="ZZ500"
+            module="UmgrIndex"
+            dataPath="/data/raw/ZZ500/"/>
+
+        <Data
+            id="HS300"
+            module="UmgrIndex"
+            dataPath="/data/raw/HS300/"/>
+
+        <Data
+            id="Basedata"
+            module="DmgrBasedata"
+            rawpricePath="/data/raw/rawprice"
+            industryPath="/data/raw/AShareIndustrySW"
+            ST="/data/raw/AShareST/"/>
+
+        <Data
+            id="PriceLimit"
+            module="DmgrPriceLimit"
+            dataPath="/data/raw/pricelimit/"/>
+
+        <Data
+            id="adjfactor"
+            module="DmgrAdjfactor"
+            dataPath="/data/raw/adjfactor/"/>
+
+        <Data
+            id="adjprice"
+            module="DmgrAdjprice"/>
+
+        <Data
+            id="ipo"
+            module="DmgrIPO"
+            dataPath="/data/raw/secID"/>
+
+        <Data
+            id="zz500Compo"
+            module="DmgrIndexCompo"
+            dataPath="/data/raw/ZZ500/"/>
+
+        <Data
+            id="hs300Compo"
+            module="DmgrIndexCompo"
+            dataPath="/data/raw/HS300/"/>
+
+        <Data
+            id="index"
+            module="DmgrIndex"
+            dataPath="/data/raw/AShareIndex/"/>
+
+        <!-- ============================================= -->
+        <!-- Derived data -->
+        <!-- ============================================= -->
+
+        <Data
+            id="returns"
+            module="DmgrReturns"
+            days="1"/>
+
+        <Data
+            id="stdret20"
+            module="DmgrStdret"
+            days="20"/>
+
+        <Data
+            id="stdret30"
+            module="DmgrStdret"
+            days="30"/>
+
+        <Data
+            id="stdret40"
+            module="DmgrStdret"
+            days="40"/>
+
+        <Data
+            id="adv5"
+            module="DmgrAdv"
+            ndays="5"/>
+
+        <Data
+            id="adv10"
+            module="DmgrAdv"
+            ndays="10"/>
+
+        <Data
+            id="adv20"
+            module="DmgrAdv"
+            ndays="20"/>
+
+        <Data
+            id="family"
+            module="DmgrFamily"/>
+
+        <!-- ============================================= -->
+        <!-- People's Daily AI Policy Alpha -->
+        <!-- ============================================= -->
+
+        <Alpha
+            id="RiskFactorModule"
+            module="/home/dwyao/WorkPlace/PeopleDailyFactor/PeopleDailyAIPolicyAlpha_v19.py"/>
+
+    </Modules>
+
+
+    <Portfolio
+        id="MyPort"
+        booksize="20e6"
+        homecurrency="CNY">
+
+        <Stats
+            module="StatsSimple"
+            tradePrice="close"
+            tax="0."
+            fee="0."
+            slippage="0."
+            printStats="true"
+            dumpPnl="true"
+            pnlDir="pnl"/>
+
+        <Alpha
+            id="factor17-1"
+            module="RiskFactorModule"
+
+            universeId="TOP3000"
+
+            booksize="20e6"
+
+            delay="0"
+
+            factorType="17"
+
+            sign="-1"
+
+            extremeCut="0.0"
+
+            priceMode="0"
+            momentumWindow="60"
+            priceWeight="0.25"
+
+            confirmBoost="0.5"
+            conflictPenalty="0.5"
+
+            reactionWindow="5"
+
+            priceExtreme="0.6"
+
+
+
+            debug="0"
+
+            dumpAlphaFile="true"
+            dumpAlphaDir="alpha">
+
+            <Operations>
+
+                <Operation
+                    module="AlphaOpTruncate"
+                    maxPercent="0.1"/>
+
+                <Operation
+                    module="AlphaOpIndNeut"
+                    group="country"/>
+
+            </Operations>
+
+        </Alpha>
+
+    </Portfolio>
+
+</Alphasim>

@@ -1,0 +1,107 @@
+provider: mlx
+
+input:
+  article_industry_path: ../data/processed/article_industry.parquet
+  news_path: ../data/processed/news_clean.parquet
+  join_key: article_id
+  industry_col: industry
+  article_weight_col: article_weight
+  title_col: title
+  text_col: text
+  date_col: date
+
+output:
+  work_dir: ./outputs
+  raw_jsonl: ./outputs/policy_labels.jsonl
+  error_jsonl: ./outputs/policy_label_errors.jsonl
+  final_parquet: ./outputs/article_industry_policy.parquet
+  daily_parquet: ./outputs/industry_signed_daily.parquet
+
+prompt:
+  template_path: ./prompts/policy_direction.txt
+  max_text_chars: 2000
+
+runtime:
+  limit: 0
+
+  resume: true
+  # 先从16开始
+  batch_size: 64
+  # tokenizer 截断后的最大输入 token
+  max_input_tokens: 2048
+
+  log_every: 1
+
+  max_retries: 3
+
+  timeout: 300
+
+  workers: 4
+  retry_failed: true
+
+  # 建议 = workers * 2
+  max_in_flight: 8
+
+  temperature: 0.0
+
+  max_tokens: 300
+
+gpu_model:
+  model: /home/dwyao/models/Qwen3-4B
+  dtype: bfloat16
+
+ollama:
+  base_url: http://127.0.0.1:11434
+  model: qwen3:4b-q4_K_M
+  endpoint: /api/chat
+
+vllm:
+  base_url: http://127.0.0.1:8000
+  model: Qwen/Qwen2.5-14B-Instruct
+  endpoint: /v1/chat/completions
+  api_key: EMPTY
+
+mlx:
+  base_url: http://127.0.0.1:8080
+  endpoint: /v1/chat/completions
+  model: mlx-community/Qwen3-1.7B-4bit
+  api_key: EMPTY
+
+label:
+  min_relevance: 0.35
+  min_confidence: 0.55
+
+aggregation:
+  use_confidence: true
+  use_relevance: true
+  use_policy_strength: true
+
+ai_factor:
+  input_daily: ./outputs/industry_signed_daily.parquet
+
+  output_parquet: ../data/factor/people_daily_ai_policy_factor.parquet
+
+  output_npz: ../data/factor/people_daily_ai_policy_factor.npz
+
+  # 原PeopleDaily因子，用于做AI residual
+  original_factor_npz: ../data/factor/people_daily_industry_factor.npz
+
+  history_window: 365
+  min_history: 120
+
+  # 防止时间序列std太小导致z-score爆炸
+  std_floor: 0.000001
+
+  # D：EWMA半衰期
+  ewm_halflife: 10
+
+  # G：高置信负面新闻
+  high_negative_confidence: 0.80
+  high_negative_relevance: 0.70
+  high_negative_policy_strength: 0.60
+
+  # H
+  constraint_policy_types:
+    - regulation
+    - restriction
+    - risk
